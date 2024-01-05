@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.core.exceptions import ValidationError
 
-from accounts.models import User
+from .models import User
 
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Confirm Password', widget=forms)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
 
     class Meta:
         model = User
@@ -17,7 +18,7 @@ class UserCreationForm(forms.ModelForm):
         p1 = cd['password1']
         p2 = cd['password2']
         if p1 and p2 and p1 != p2:
-            raise forms.ValidationError('passwords must match')
+            raise ValidationError('passwords must match')
         return cd['password2']
 
     def save(self, commit=True):
@@ -34,4 +35,32 @@ class UerChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'phone_number', 'full_name', 'password1', 'last_login')
+        fields = ('email', 'phone_number', 'full_name', 'password', 'last_login')
+
+
+class UserRegistrationForm(forms.Form):
+    email = forms.EmailField()
+    full_name = forms.CharField(label='full name', max_length=100)
+    phone = forms.CharField(max_length=11)
+    password = forms.CharField(label='password', widget=forms.PasswordInput)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('This Email Already Exists')
+        return email
+
+    def phone_clean(self):
+        phone = self.cleaned_data['phone']
+        if User.objects.filter(phone=phone).exists():
+            raise ValidationError('This Phone Already Exists')
+        return phone
+
+
+class VerifyCodeForm(forms.Form):
+    code = forms.IntegerField()
+
+
+class UserLoginForm(forms.Form):
+    phone = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
