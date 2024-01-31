@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User
+from .models import User, OtpCode
 
 
 class UserCreationForm(forms.ModelForm):
@@ -50,10 +50,11 @@ class UserRegistrationForm(forms.Form):
             raise ValidationError('This Email Already Exists')
         return email
 
-    def phone_clean(self):
+    def clean_phone(self):
         phone = self.cleaned_data['phone']
         if User.objects.filter(phone=phone).exists():
             raise ValidationError('This Phone Already Exists')
+        OtpCode.objects.filter(phone_number=phone).delete()
         return phone
 
 
