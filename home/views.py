@@ -1,8 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 
 from home.models import Product
-from .tasks import all_bucket_objects_task
+from utils import IsAdminUserMixin
+from . import tasks
+
 
 class HomeView(View):
     def get(self, request):
@@ -16,9 +19,23 @@ class ProductDetailView(View):
         return render(request, 'home/detail.html', {'product': product})
 
 
-class BucketHome(View):
+class BucketHome(IsAdminUserMixin, View):
     template_name = 'home/bucket.html'
 
     def get(self, request):
-        objects = all_bucket_objects_task()
+        objects = tasks.all_bucket_objects_task()
         return render(request, self.template_name)
+
+
+class DeleteBucketObject(IsAdminUserMixin, View):
+    def get(self, request, key):
+        tasks.delete_object_task.delay(key)
+        messages.success(request, 'your object will be delete soon.', 'info')
+        return redirect('home:bucket')
+
+
+class DownloadBucketObject(IsAdminUserMixin, View):
+    def get(self, request, key):
+        tasks.download_object_task.delay(key)
+        messages.success(request, 'your download will start soon.', 'info')
+        return redirect('home:bucket')
