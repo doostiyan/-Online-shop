@@ -21,18 +21,18 @@ class Bucket(object):
 
     def get_objects(self):
         result = self.conn.list_objects_v2(Bucket=settings.AWS_STORAGE_BUCKET_NAME)
-        if result['KeyCount']:
+        if result['KeyCount']: # aghe tedad bucket 0 bood error nade
             return result['Contents']
         else:
             return None
 
-    def delete_object(self, key):
+    def delete_object(self, key): # key name bucket
         self.conn.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
         return True
 
     def download_object(self, key):
-        with open(key, 'web') as f:
-            self.conn.download_fileobj(settings.AWS_STORAGE_BUCKET_NAME + key, f)
+        with open(settings.AWS_LOCAL_STORAGE + key, 'wb') as f: # wb write binary
+            self.conn.download_fileobj(settings.AWS_STORAGE_BUCKET_NAME, key, f)
 
 
 bucket = Bucket()
