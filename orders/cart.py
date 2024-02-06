@@ -9,7 +9,7 @@ class Cart:
         cart = self.session.get(CART_SESSION_ID)
         if not cart: # aghe sabad kharid khali bood
             cart = self.session[CART_SESSION_ID] = {}
-            self.cart = cart
+        self.cart = cart
 
     def __iter__(self):
         product_ids = self.cart.keys()
@@ -43,3 +43,7 @@ class Cart:
 
     def get_total_price(self):
         return sum(int(item['price']) * item['quantity'] for item in self.cart.values())
+
+    def clear(self):
+        del self.session[CART_SESSION_ID]
+        self.save()
