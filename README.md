@@ -45,9 +45,62 @@ An e-commerce platform built with Django and templates, offering a user-friendly
     pip install -r requirements.txt
     ```
 
-4. **Configure your database settings, RabbitMQ, and Zarinpal API keys in `settings.py`.**
+4. **Install Celery:**
 
-5. **Apply the migrations:**
+    Celery should be included in your `requirements.txt`, but if not, you can install it manually:
+
+    ```bash
+    pip install celery
+    ```
+
+5. **Configure your database settings, RabbitMQ, and Zarinpal API keys in `settings.py`.**
+
+6. **Apply the migrations:**
 
     ```bash
     python manage.py migrate
+    ```
+
+7. **Start RabbitMQ Server:**
+
+    Ensure RabbitMQ is running. You can start it with:
+
+    ```bash
+    sudo service rabbitmq-server start
+    ```
+
+8. **Start Celery Worker:**
+
+    Start Celery with RabbitMQ as the broker:
+
+    ```bash
+    celery -A your_project_name worker -l info
+    ```
+
+9. **Create a superuser:**
+
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+10. **Run the development server:**
+
+    ```bash
+    python manage.py runserver
+    ```
+
+11. **Visit the site:**
+
+    Open your browser and go to `http://127.0.0.1:8000/`.
+
+## Contributing
+
+We welcome contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+If you have any questions or suggestions, please contact us at support@example.com.
